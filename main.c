@@ -38,16 +38,17 @@ int main(int argc, char *argv[]) {
     parse_args(argc, argv);
 
     if (OPENRGB_SERVER) {
-        logger(MAIN, "OpenRGB server IP is set, starting OpenRGB!");
+        logger(MAIN, "OpenRGB server IP is set, starting OpenRGB thread!");
         pthread_t orgb_thread;
         pthread_create(&orgb_thread, NULL, openrgb_init, NULL);
+        pthread_detach(orgb_thread);
     } else {
         logger(MAIN, "Not starting OpenRGB since OpenRGB server IP not set.");
     }
 
     pi = pigpio_start(PI_ADDR, PI_PORT);
     if (pi < 0) {
-        logger(MAIN, "Pigpio initialization failed.\n");
+        logger(MAIN, "Pigpio initialization failed.");
         return 1;
     }
     logger(MAIN, "Connected to pigpio daemon successfully!");

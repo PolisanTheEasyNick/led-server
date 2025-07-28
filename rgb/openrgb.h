@@ -35,7 +35,8 @@ extern struct openrgb_controller_data *openrgb_controllers;
 extern int8_t openrgb_parsed_all_devices;
 extern volatile sig_atomic_t openrgb_stop_server, openrgb_exit;
 
-struct openrgb_controller_data {
+struct openrgb_controller_data
+{
     // NET_PACKET_ID_REQUEST_CONTROLLER_DATA response type for version 3 of OpenRGB SDK
     uint32_t data_size; // size of all data in packet
     int32_t type;       // RGBController type field value
@@ -72,7 +73,8 @@ struct openrgb_controller_data {
     uint8_t *colors;     // RGBController colors field values
 };
 
-struct openrgb_mode_data {
+struct openrgb_mode_data
+{
     uint16_t mode_name_len;       // Length of mode name string, including null termination
     uint8_t *mode_name;           // Mode name string value, including null termination
     uint32_t mode_value;          // Mode value field value
@@ -91,7 +93,8 @@ struct openrgb_mode_data {
     uint32_t *mode_colors;        // Mode color values
 };
 
-struct openrgb_zone_data {
+struct openrgb_zone_data
+{
     uint16_t zone_name_len;
     uint8_t *zone_name;
     uint32_t zone_type;
@@ -104,14 +107,15 @@ struct openrgb_zone_data {
     uint32_t *zone_matrix_data;
 };
 
-struct openrgb_led_data {
+struct openrgb_led_data
+{
     uint16_t led_name_len;
     uint8_t *led_name;
     uint32_t led_value;
 };
 
 void openrgb_init_header(uint8_t *header, uint32_t pkt_dev_idx, uint32_t pkt_id, uint32_t pkg_size);
-void *openrgb_init();
+void *openrgb_init(void *arg);
 void openrgb_shutdown();
 void openrgb_request_protocol_version();
 void openrgb_set_client_name();
