@@ -68,6 +68,8 @@ Must be generated with SHA-256 algorithm with using `shared_secret` which writed
 | 3     | [ANIM_SET_PULSE](#anim_set_pulse)               | Start PULSE animation                           |
 | 4     | [SYS_TOGGLE_SUSPEND](#sys_toggle_suspend)       | Toggle suspend mode                             |
 | 5     | [SYS_COLOR_CHANGED](#sys_color_changed)         | Sent from server to all clients about new color |
+| 6     | [SYS_SET_DEFAULT_COLOR](#sys_set_default_color) | Set default color for waking from suspend mode  |
+| 7     | [SYS_GET_DEFAULT_COLOR](#sys_get_default_color) | Get default color for waking from suspend mode  |
 
 
 ## PAYLOAD Structure
@@ -106,12 +108,22 @@ Request size: 55 bytes (`HEADER` + `HMAC` + `PAYLOAD`)
 Response size: 0 bytes (no response).  
 Toggles Suspend mode.  
 While suspended, it will turn off all lights and ignore all commands but `SYS_TOGGLE_SUSPEND`.
-On suspend off will set given color from payload.
 
 ## SYS_COLOR_CHANGED
 Request size: 0 bytes (no response).  
 Response size: 55 bytes. (`HEADER` + `HMAC` + `PAYLOAD`)  
 Sends info about new color to all clients.  
+
+## SYS_SET_DEFAULT_COLOR
+Added in Version 5
+Request size: 55 bytes (`HEADER` + `HMAC` + `PAYLOAD`)
+Response size: 0 bytes (no response).
+Sets default color, which will be set after waking up from suspend mode.
+
+## SYS_GET_DEFAULT_COLOR
+Request size: 50 bytes (`HEADER` + `HMAC` without `PAYLOAD`)  
+Response size: 55 bytes. (`HEADER` + `HMAC` + `PAYLOAD`)  
+Returns default color, which sets after waking up from suspend mode.
 
 ## Client Side Workflow
 1. Generate Timestamp and Nonce  

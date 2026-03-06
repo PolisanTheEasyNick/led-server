@@ -173,6 +173,25 @@ handle_client(void *client_sock)
 
                 switch (result.version)
                 {
+                    case 5:
+                    {
+                        logger_debug(TCP, "v%d, OP is: %d", result.version, result.OP);
+                        switch (result.OP) {
+                            case(SYS_SET_DEFAULT_COLOR): {
+                                logger_debug(TCP, "Requested SYS_SET_DEFAULT_COLOR, setting %d, %d, %d", result.RED, result.GREEN, result.BLUE);
+                                DEFAULT_COLOR = (struct Color){result.RED, result.GREEN, result.BLUE};
+                                update_config_int("DEFAULT_RED", DEFAULT_COLOR.RED);
+                                update_config_int("DEFAULT_GREEN", DEFAULT_COLOR.GREEN);
+                                update_config_int("DEFAULT_BLUE", DEFAULT_COLOR.BLUE);
+                                break;
+                            }
+                            case(SYS_GET_DEFAULT_COLOR): {
+                                logger_debug(TCP, "Requested SYS_GET_DEFAULT_COLOR");
+                                send_info_about_color(1, DEFAULT_COLOR);
+                                break;
+                            }
+                        }
+                    }
                     case 4:
                     case 3:
                     {
@@ -197,7 +216,7 @@ handle_client(void *client_sock)
                             case LED_GET_CURRENT_COLOR:
                             {
                                 logger(TCP, "Requested LED_GET_CURRENT_COLOR, sending...");
-                                send_info_about_color();
+                                send_info_about_color(0, (struct Color){0, 0, 0});
                                 break;
                             }
 
@@ -258,13 +277,13 @@ handle_client(void *client_sock)
                                 set_color_duration(pi,
                                                    (struct Color) {is_suspended
                                                                    ? 0
-                                                                   : result.RED,
+                                                                   : DEFAULT_COLOR.RED,
                                                                    is_suspended
                                                                    ? 0
-                                                                   : result.GREEN,
+                                                                   : DEFAULT_COLOR.GREEN,
                                                                    is_suspended
                                                                    ? 0
-                                                                   : result.BLUE},
+                                                                   : DEFAULT_COLOR.BLUE},
                                                    result.duration);
                                 break;
                             }
@@ -410,13 +429,19 @@ start_server(int pi, int port)
 }
 
 void
-send_info_about_color()
+send_info_about_color(int custom_color, struct Color color)
 {
-    struct Color color = {
-        get_PWM_dutycycle(pi, RED_PIN), get_PWM_dutycycle(pi, GREEN_PIN),
-        get_PWM_dutycycle(pi, BLUE_PIN)
-    };
-    logger_debug(TCP, "Sending info about current color: %d %d %d", color.RED, color.GREEN, color.BLUE);
+    //custom_color == 0 means current color
+    //any other value means default color for settings.
+    if(custom_color == 0) {
+        color = (struct Color){
+            get_PWM_dutycycle(pi, RED_PIN), get_PWM_dutycycle(pi, GREEN_PIN),
+            get_PWM_dutycycle(pi, BLUE_PIN)
+        };
+        logger_debug(TCP, "Sending info about current color: %d %d %d", color.RED, color.GREEN, color.BLUE);
+    } else {
+        logger_debug(TCP, "Sending info about default color: %d %d %d", color.RED, color.GREEN, color.BLUE);
+    }
 
     #ifdef libwebsockets_FOUND
     ws_broadcast_color(color);
@@ -435,6 +460,10 @@ send_info_about_color()
 
     uint8_t version = 4;
     uint8_t OP = SYS_COLOR_CHANGED;
+    if(custom_color != 0) {
+        version = 5;
+        OP = SYS_GET_DEFAULT_COLOR;
+    }
     HEADER[16] = version;
     HEADER[17] = OP;
 

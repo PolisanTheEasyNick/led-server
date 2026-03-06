@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 4.2)
 
 project(piled LANGUAGES C)
 
@@ -7,7 +7,7 @@ set(CMAKE_CXX_FLAGS "-Wno-dev")
 option(WITH_HTML "Build with HTML support" OFF)
 option(WITH_WS "Build with WebSocket support" OFF)
 
-#add_definitions(-DDEBUG) #DANGEROUS! IT WILL SKIP SECURITY CHECKS
+# add_definitions(-DDEBUG) #DANGEROUS! IT WILL SKIP SECURITY CHECKS
 if(DEBUG)
   message(WARNING "!!!  DEBUG MODE IS ON  !!! ALL SECURITY CHECKS ARE SKIPPED")
 endif()
@@ -34,7 +34,7 @@ if(WITH_HTML)
   endif()
 endif()
 
-if(NOT pigpio_FOUND)
+if(NOT PIGPIO_FOUND)
   message(WARNING "pigpio not found in system! Will be builded from submodule.")
   add_subdirectory("${CMAKE_SOURCE_DIR}/pigpio")
   set(pigpio_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/pigpio")
@@ -67,7 +67,7 @@ if(MICROHTTPD_FOUND AND WITH_HTML)
   target_link_libraries(piled microhttpd)
 endif()
 
-if(NOT pigpio_FOUND)
+if(NOT PIGPIO_FOUND)
   add_dependencies(piled pigpiod_if2)
 endif()
 

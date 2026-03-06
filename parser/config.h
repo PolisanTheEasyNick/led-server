@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+int update_config_int(const char *setting_name, int new_value);
 uint8_t parse_config(const char *config_file);
 void parse_args(int argc, char *argv[]);
 uint8_t try_load_config(const char *config_path);

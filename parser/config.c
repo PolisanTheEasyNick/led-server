@@ -5,6 +5,44 @@
 #include <libconfig.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+
+int update_config_int(const char *setting_name, int new_value) {
+    if (access(config_file, W_OK) != 0) {
+        fprintf(stderr, "No write permission for config file: %s\n", config_file);
+        return -1;
+    }
+
+    config_t cfg;
+    config_setting_t *setting;
+
+    config_init(&cfg);
+
+    if (!config_read_file(&cfg, config_file)) {
+        fprintf(stderr, "Config Error: %s:%d - %s\n",
+                config_error_file(&cfg), config_error_line(&cfg), config_error_text(&cfg));
+        config_destroy(&cfg);
+        return -1;
+    }
+
+    setting = config_lookup(&cfg, setting_name);
+
+    if (setting != NULL) {
+        config_setting_set_int(setting, new_value);
+    } else {
+        setting = config_setting_add(config_root_setting(&cfg), setting_name, CONFIG_TYPE_INT);
+        config_setting_set_int(setting, new_value);
+    }
+
+    if (!config_write_file(&cfg, config_file)) {
+        fprintf(stderr, "Error while writing to file: %s\n", config_file);
+        config_destroy(&cfg);
+        return -1;
+    }
+
+    config_destroy(&cfg);
+    return 0;
+}
 
 uint8_t parse_config(const char *config_file) {
     config_t cfg;
@@ -77,6 +115,24 @@ uint8_t parse_config(const char *config_file) {
         logger(PARSER, "Missing OPENRGB_PORT in config file, using default 6742\n");
         OPENRGB_PORT = 6742;
     }
+
+    int default_red = 0, default_green = 0, default_blue = 0;
+    if (!config_lookup_int(&cfg, "DEFAULT_RED", &default_red)) {
+        logger(PARSER, "Missing DEFAULT_RED in config file, using default 0\n");
+    }
+    if (!config_lookup_int(&cfg, "#DEFAULT_GREEN", &default_green)) {
+        logger(PARSER, "Missing #DEFAULT_GREEN in config file, using default 0\n");
+    }
+    if (!config_lookup_int(&cfg, "#DEFAULT_BLUE", &default_blue)) {
+        logger(PARSER, "Missing #DEFAULT_BLUE in config file, using default 0\n");
+    }
+    logger(PARSER, "Parsed default color: %i, %i, %i\n", default_red, default_green, default_blue);
+    DEFAULT_COLOR.RED = default_red;
+    DEFAULT_COLOR.GREEN = default_green;
+    DEFAULT_COLOR.BLUE = default_blue;
+
+
+
 #ifndef ORGBCONFIGURATOR
     logger(PARSER,
            "Passed config:\nRaspberry Pi address: %s\nPort: %s\nRed pin: %d\nGreen pin: %d\nBlue pin: %d\nShared "
@@ -161,6 +217,9 @@ int load_config() {
         logger(PARSER, "Can't load any of the configs! Aborting.");
         return -1;
     }
+
+    strcpy(config_file, "/etc/piled/piled.conf");
+
 
     return 0;
 }
