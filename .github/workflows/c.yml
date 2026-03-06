@@ -21,6 +21,22 @@ jobs:
     - name: Install dependencies
       run: sudo apt-get update && sudo apt-get install -y libssl-dev libconfig-dev cmake
 
+    - name: Install Latest CMake
+      run: |
+        wget https://github.com/Kitware/CMake/releases/download/v4.2.0/cmake-4.2.0-linux-x86_64.tar.gz
+        tar -zxvf cmake-4.2.0-linux-x86_64.tar.gz
+        sudo cp -r cmake-4.2.0-linux-x86_64/bin/* /usr/local/bin/
+        sudo cp -r cmake-4.2.0-linux-x86_64/share/* /usr/local/share/
+        cmake --version
+
+    - name: Build and Install pigpio
+      run: |
+        cd pigpio
+        make
+        sudo make install
+        sudo ldconfig
+        cd ..
+
     - name: Create build directory
       run: mkdir -p build && cd build
 
