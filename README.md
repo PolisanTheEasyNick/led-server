@@ -119,6 +119,7 @@ Added in Version 5
 Request size: 55 bytes (`HEADER` + `HMAC` + `PAYLOAD`)
 Response size: 0 bytes (no response).
 Sets default color, which will be set after waking up from suspend mode.
+Note, that if using config at /etc, PiLED may not have needed permissions for editing config file, so settings will be saved only in current run.
 
 ## SYS_GET_DEFAULT_COLOR
 Request size: 50 bytes (`HEADER` + `HMAC` without `PAYLOAD`)  
