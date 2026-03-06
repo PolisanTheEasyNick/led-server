@@ -2,6 +2,7 @@
 #define GLOBALS_H
 
 #include <stdint.h>
+#include "../utils/utils.h"
 
 struct openrgb_device {
     uint32_t device_id;
@@ -17,6 +18,7 @@ extern int BLUE_PIN;
 extern char *OPENRGB_SERVER;
 extern int OPENRGB_PORT;
 extern char config_file[256];
+extern struct Color DEFAULT_COLOR;
 
 extern struct openrgb_device *openrgb_devices_to_change; // defined in openrgb.c
 extern int32_t openrgb_using_devices_num;                // defined in openrgb.c
@@ -36,5 +38,7 @@ extern uint8_t pi; // should be inited by main
 #define ANIM_SET_PULSE 3
 #define SYS_TOGGLE_SUSPEND 4
 #define SYS_COLOR_CHANGED 5
+#define SYS_SET_DEFAULT_COLOR 6
+#define SYS_GET_DEFAULT_COLOR 7
 
 #endif // GLOBALS_H

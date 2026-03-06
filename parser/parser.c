@@ -192,6 +192,20 @@ struct parse_result parse_message(unsigned char buffer[BUFFER_SIZE]) {
         result.version = 4;
         break;
     }
+    case SYS_SET_DEFAULT_COLOR: {
+        logger_debug(PARSER, "parse_message: OP code is SYS_SET_DEFAULT_COLOR.");
+        result = parse_payload(buffer, version, PARSED_HMAC);
+        result.OP = SYS_SET_DEFAULT_COLOR;
+        result.version = 5;
+        break;
+    }
+    case SYS_GET_DEFAULT_COLOR: {
+        logger_debug(PARSER, "parse_message: OP code is SYS_GET_DEFAULT_COLOR.");
+        result = parse_payload(buffer, version, PARSED_HMAC);
+        result.OP = SYS_GET_DEFAULT_COLOR;
+        result.version = 5;
+        break;
+    }
     default: {
         logger_debug(PARSER, "parse_message: Unknown OP (%d), aborting!", OP);
         result.result = 1;

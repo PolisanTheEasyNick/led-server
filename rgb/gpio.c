@@ -22,7 +22,7 @@ void set_color(int pi, struct Color color) {
     // will spam at animation :3
     // but will be synced with UI on clients
     // sending info about new color to all clients
-    send_info_about_color();
+    send_info_about_color(0, (struct Color){0, 0, 0});
 }
 
 void set_color_duration(int pi, struct Color color, uint8_t duration) {
@@ -79,7 +79,7 @@ void fade_out(int pi, uint8_t color_pin, uint8_t speed) {
         struct Color cur_color = {get_PWM_dutycycle(pi, RED_PIN), get_PWM_dutycycle(pi, GREEN_PIN),
                                   get_PWM_dutycycle(pi, BLUE_PIN)};
         openrgb_set_color_on_devices(cur_color);
-        send_info_about_color();
+        send_info_about_color(0, (struct Color){0, 0, 0});
         usleep(5000 / speed);
     }
 }
@@ -97,7 +97,7 @@ void fade_in(int pi, uint8_t color_pin, uint8_t speed) {
         struct Color cur_color = {get_PWM_dutycycle(pi, RED_PIN), get_PWM_dutycycle(pi, GREEN_PIN),
                                   get_PWM_dutycycle(pi, BLUE_PIN)};
         openrgb_set_color_on_devices(cur_color);
-        send_info_about_color();
+        send_info_about_color(0, (struct Color){0, 0, 0});
         usleep(5000 / speed);
     }
 }
